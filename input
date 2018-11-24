@@ -1,0 +1,3 @@
+Dim As Integer a
+a = 10
+Print a
