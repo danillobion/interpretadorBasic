@@ -1,45 +1,58 @@
 %{
+#ifndef YYSTYPE
+#define YYSTYPE long int
+#endif
+#include "y.tab.h"
 #include "lista.h"
 #include <stdio.h>
 
-simbolo *s;
-no_tabela *t;
+
 %}
-ws      \t|\n|\r|" "
+
+letra	[a-z|A-Z|_]
+numero	[0-9]
+identificador	{letra}({letra}|{numero})*
 
 %%
-{ws}                      { }
+dim                       {return DIM;}
+as                        {return AS;}
+integer                   {
+                              yylval = INTEIRO;
+                              return TYPE;
+                          }
+declare                   {return DECLARE;}
+function                  {return FUNCTION;}
+end                       {return END;}
+print                     {return PRINT;}
 
-Dim                       printf("<Dim,null>");
-As                        printf("<As,null>");
-Integer                   printf("<Integer,null>");
-Double                    printf("<Double,null>");
-String                    printf("<String, null>");
+{numero}+                 {
+                              valor v;
+                              v.ival = atoi(yytext);
+                              yylval = (long int) criar_numero(v, INTEIRO);
+                              return NUMBER;
+                          }
 
-if                        printf("<If,null>");
-else                      printf("<Else,null>");
-Print                     printf("<Print,null>");
+{numero}+"."{numero}+     { }
 
-[a-zA-Z][a-zA-Z]*         t = verifica(t,s,yytext);
-[0-9]*                    printf("<number,%s>", yytext);
 
 "<"                       printf("<relop,LT>");
 "<="                      printf("<relop,LE>");
-"="                       printf("<relop,EQ>");
+"="                       {return ATTR;}
 "<>"                      printf("<relop,NE>");
 ">"                       printf("<relop,GT>");
 ">="                      printf("<relop,GE>");
 
+{identificador}           {
+                              yylval = (long int) strdup(yytext);
+                              return ID;
+
+                          }
+
+[-+=*/(){};,]	               {	return *yytext; }
+
+[ \t\n]                   ;
 
 %%
-
-int main(int argc, char *argv[]){
-
-
-  printf("\n\n");
-  yylex();
-  printf("\n\n");
-  imprimirTabela(t);
-
+int yywrap(void){
+  return 1;
 }
-int yywrap() { return 1;}

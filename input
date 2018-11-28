@@ -1,3 +1,12 @@
-Dim As Integer a
-a = 10
-Print a
+declare function soma(a as integer, b as integer) as integer
+  dim c as integer
+  c = a + b
+end function
+
+dim a as integer
+dim b as integer
+dim resultado as integer
+
+a = 1
+b = 2
+resultado = soma(a,b)
