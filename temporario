@@ -11,15 +11,17 @@ pilha_contexto *pilha;
 
 %}
 
-%token DIM AS NUMBER ID TYPE INTEIRO EQ RELOP ATTR DECLARE FUNCTION END
-
+%token DIM AS NUMBER ID TYPE INTEIRO RELOP ATTR DECLARE FUNCTION END PRINT MOD IF THEN ELSE ENDIF LT LE GT GE EQ NE AND OR NOT
+%left '+' '-'
+%left '*' '/'
+%left MOD
 %%
 program:
         functs bloco
         ;
 
 params:
-        params ';' param
+        params ',' param
         |param
         ;
 param:
@@ -48,88 +50,26 @@ decls:
 decl:
         DIM ID AS TYPE
         ;
-
 stmts:
         stmts stmt
         |
         ;
 stmt:
         attr
-        ;
-
-attr:
-        ID ATTR expr
-        ;
-expr:
-        NUMBER
-        ;
-
-
-
-
-%%
-
-void yyerror(char *s){
-  fprintf(stderr, "%s\n",s);
-}
-
-int main(void){
-  pilha = NULL;
-  tabela *contexto = criar_contexto(topo_pilha(pilha));
-  yyparse();
-  return 0;
-}
-
-############################################
-%%
-program:
-        functs bloco
-        ;
-
-params:
-        params ';' param
-        |param
-        ;
-param:
-        ID AS TYPE
-        ;
-paramsv:
-        params
-        |
-        ;
-
-functs:
-        functs funct
-        |
-        ;
-funct:
-        DECLARE FUNCTION ID '(' paramsv ')' AS TYPE bloco END FUNCTION
-        ;
-bloco:
-        decls stmts
-        ;
-
-decls:
-        decls decl
-        |
-        ;
-decl:
-        DIM ID AS TYPE
-        ;
-
-
-stmts:
-        stmts stmt
+        |cond
         |funCall
         ;
-stmt:
-        attr
+cond:
+        IF booleano THEN bloco ENDIF
+        |IF booleano THEN bloco ELSE bloco ENDIF
         ;
+booleano:
+        expr RELOP expr
 
+        ;
 attr:
         ID ATTR expr
         ;
-
 expr:
         NUMBER
         |ID
@@ -139,7 +79,7 @@ expr:
         |expr '*' expr
         |expr '/' expr
         |'(' expr ')'
-
+        |expr MOD expr
         ;
 
 funCall:
@@ -149,85 +89,10 @@ argv:
         args
         |
         ;
+
 args:
         args ',' expr
         |expr
-        ;
-%%
-
-
-
-
-###########################################
-%{
-#ifndef YYSTYPE
-#define YYSTYPE long int
-#endif
-#include <stdlib.h>
-#include <stdio.h>
-#include "lista.h"
-int yylex(void);
-void yyerror(char *);
-pilha_contexto *pilha;
-
-%}
-
-%token DIM AS NUMBER ID TYPE INTEIRO EQ RELOP ATTR DECLARE FUNCTION END PRINT
-%left '+' '-'
-%left '*' '/'
-%%
-program:
-        functs bloco
-        ;
-
-params:
-        params ';' param
-        |param
-        ;
-param:
-        ID AS TYPE
-        ;
-paramsv:
-        params
-        |
-        ;
-
-functs:
-        functs funct
-        |
-        ;
-funct:
-        DECLARE FUNCTION ID '(' paramsv ')' AS TYPE bloco END FUNCTION
-        ;
-bloco:
-        decls stmts
-        ;
-
-decls:
-        decls decl
-        |
-        ;
-decl:
-        DIM ID AS TYPE
-        ;
-stmts:
-        stmts stmt
-        |
-        ;
-stmt:
-        attr
-        ;
-attr:
-        ID ATTR expr
-        ;
-expr:
-        NUMBER
-        |ID
-        |expr '+' expr
-        |expr '-' expr
-        |expr '*' expr
-        |expr '/' expr
-        |'(' expr ')'
         ;
 
 
@@ -243,3 +108,5 @@ int main(void){
   yyparse();
   return 0;
 }
+
+######################################

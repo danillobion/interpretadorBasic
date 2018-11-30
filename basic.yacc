@@ -11,9 +11,12 @@ pilha_contexto *pilha;
 
 %}
 
-%token DIM AS NUMBER ID TYPE INTEIRO EQ RELOP ATTR DECLARE FUNCTION END PRINT
+%token DIM AS NUMBER ID TYPE INTEIRO RELOP ATTR DECLARE FUNCTION END PRINT MOD IF TO THEN ELSE ENDIF LT LE GT GE EQ NE AND OR NOT DO LOOP UNTIL
+%left RELOP OR AND NOT
 %left '+' '-'
 %left '*' '/'
+%left MOD
+
 %%
 program:
         functs bloco
@@ -48,14 +51,32 @@ decls:
         ;
 decl:
         DIM ID AS TYPE
+
+
         ;
+
 stmts:
         stmts stmt
         |
         ;
 stmt:
         attr
+        |cond
         |funCall
+        |loop
+        ;
+cond:
+        IF booleano THEN bloco ENDIF
+        |IF booleano THEN bloco ELSE bloco ENDIF
+        ;
+booleano:
+        expr RELOP expr
+        |logico
+        ;
+logico:
+        booleano AND booleano
+        |booleano OR booleano
+        |NOT booleano
         ;
 attr:
         ID ATTR expr
@@ -69,6 +90,7 @@ expr:
         |expr '*' expr
         |expr '/' expr
         |'(' expr ')'
+        |expr MOD expr
         ;
 
 funCall:
@@ -82,6 +104,9 @@ argv:
 args:
         args ',' expr
         |expr
+        ;
+loop:
+        DO UNTIL '(' booleano ')' bloco LOOP
         ;
 
 %%

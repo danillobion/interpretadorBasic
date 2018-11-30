@@ -6,7 +6,6 @@
 #include "lista.h"
 #include <stdio.h>
 
-
 %}
 
 letra	[a-z|A-Z|_]
@@ -24,6 +23,22 @@ declare                   {return DECLARE;}
 function                  {return FUNCTION;}
 end                       {return END;}
 print                     {return PRINT;}
+mod                       {return MOD;}
+if                        {return IF;}
+then                      {return THEN;}
+"end if"                  {return ENDIF;}
+else                      {return ELSE;}
+
+and                       {return AND;}
+or                        {return OR;}
+not                       {return NOT;}
+
+do                        {return DO;}
+loop                      {return LOOP;}
+until                     {return UNTIL;}
+
+to                        {return TO;}
+
 
 {numero}+                 {
                               valor v;
@@ -35,12 +50,15 @@ print                     {return PRINT;}
 {numero}+"."{numero}+     { }
 
 
-"<"                       printf("<relop,LT>");
-"<="                      printf("<relop,LE>");
+"<"                       {yylval = LT; return RELOP;}
+"<="                      {yylval = LE; return RELOP;}
+">"		                    {yylval = GT; return RELOP;}
+">="                      {yylval = GE; return RELOP;}
+"=="                      {yylval = EQ; return RELOP;}
+"!="                      {yylval = NE; return RELOP;}
+
+
 "="                       {return ATTR;}
-"<>"                      printf("<relop,NE>");
-">"                       printf("<relop,GT>");
-">="                      printf("<relop,GE>");
 
 {identificador}           {
                               yylval = (long int) strdup(yytext);

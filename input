@@ -10,3 +10,29 @@ dim resultado as integer
 a = 1
 b = 2
 resultado = soma(a,b)
+
+a = a mod b
+
+if a>=b then
+  dim a as integer
+  a = 1
+  soma(a)
+end if
+
+if a == b and a <=b then
+  dim a as integer
+  a = 1
+  soma(a)
+else
+  dim a as integer
+  a = 1
+  soma(a)
+end if
+
+do until (a > 10)
+  if a>=b then
+    dim a as integer
+    a = 1
+    soma(a)
+  end if
+loop
