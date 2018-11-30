@@ -1,45 +1,77 @@
 %{
+#ifndef YYSTYPE
+#define YYSTYPE long int
+#endif
+#include "y.tab.h"
 #include "lista.h"
 #include <stdio.h>
 
-simbolo *s;
-no_tabela *t;
+
 %}
-ws      \t|\n|\r|" "
+
+letra	[a-z|A-Z|_]
+numero	[0-9]
+identificador	{letra}({letra}|{numero})*
 
 %%
-{ws}                      { }
+dim                       {return DIM;}
+as                        {return AS;}
+integer                   {
+                              yylval = INTEIRO;
+                              return TYPE;
+                          }
+declare                   {return DECLARE;}
+function                  {return FUNCTION;}
+end                       {return END;}
+print                     {return PRINT;}
+mod                       {return MOD;}
+if                        {return IF;}
+then                      {return THEN;}
+"end if"                  {return ENDIF;}
+else                      {return ELSE;}
 
-Dim                       printf("<Dim,null>");
-As                        printf("<As,null>");
-Integer                   printf("<Integer,null>");
-Double                    printf("<Double,null>");
-String                    printf("<String, null>");
+and                       {return AND;}
+or                        {return OR;}
+not                       {return NOT;}
 
-if                        printf("<If,null>");
-else                      printf("<Else,null>");
-Print                     printf("<Print,null>");
+do                        {return DO;}
+loop                      {return LOOP;}
+until                     {return UNTIL;}
 
-[a-zA-Z][a-zA-Z]*         t = verifica(t,s,yytext);
-[0-9]*                    printf("<number,%s>", yytext);
+to                        {return TO;}
 
-"<"                       printf("<relop,LT>");
-"<="                      printf("<relop,LE>");
-"="                       printf("<relop,EQ>");
-"<>"                      printf("<relop,NE>");
-">"                       printf("<relop,GT>");
-">="                      printf("<relop,GE>");
 
+{numero}+                 {
+                              valor v;
+                              v.ival = atoi(yytext);
+                              yylval = (long int) criar_numero(v, INTEIRO);
+                              return NUMBER;
+                          }
+
+{numero}+"."{numero}+     { }
+
+
+"<"                       {yylval = LT; return RELOP;}
+"<="                      {yylval = LE; return RELOP;}
+">"		                    {yylval = GT; return RELOP;}
+">="                      {yylval = GE; return RELOP;}
+"=="                      {yylval = EQ; return RELOP;}
+"!="                      {yylval = NE; return RELOP;}
+
+
+"="                       {return ATTR;}
+
+{identificador}           {
+                              yylval = (long int) strdup(yytext);
+                              return ID;
+
+                          }
+
+[-+=*/(){};,]	               {	return *yytext; }
+
+[ \t\n]                   ;
 
 %%
-
-int main(int argc, char *argv[]){
-
-
-  printf("\n\n");
-  yylex();
-  printf("\n\n");
-  imprimirTabela(t);
-
+int yywrap(void){
+  return 1;
 }
-int yywrap() { return 1;}

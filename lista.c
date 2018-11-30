@@ -3,72 +3,85 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-no_tabela* inicializaTbl(void){
-  return NULL;
-}
-simbolo* inicializaSbl(void){
-  return NULL;
-}
-simbolo* criar_simbolo(int code, char* lexema){
-  simbolo* novo = (simbolo*) malloc(sizeof(simbolo));
-  char *converte = (char*)malloc(sizeof(lexema));
-  novo->code=code;
-  novo->lexema=converte;
-  strcpy(novo->lexema, lexema);
-  return novo;
-}
 
-no_tabela* inserir_simboloTbl(no_tabela* tbl, simbolo* simbolo){
-    no_tabela* novo = (no_tabela*) malloc(sizeof(no_tabela));
-    novo->dado=*simbolo;
-    novo->proximo=tbl;
-    return novo;
-}
 
-no_tabela* verifica(no_tabela* tbl, simbolo* simbolo, char* lexema){
-  if(capturaIdlexema(tbl,lexema)!=-1){ //verifica se já tá na tabela
-    printf("<id,%d>",capturaIdlexema(tbl,lexema));
-    return tbl;
-  }else{  //caso não esteja na tabela
-    int idTemp = capturaId(tbl)+1;
-    printf("<id,%d>",idTemp);
-    return inserir_simboloTbl(tbl,criar_simbolo(idTemp,lexema));
-
-  }
+void inserir_simbolo(tabela *t, simbolo *s) {
+	no_tabela *no = (no_tabela *) malloc(sizeof(no_tabela));
+	no->dado = s;
+	no->proximo = t->primeiro;
+	t->primeiro = no;
 }
 
 
-int capturaId(no_tabela* tbl){
-  int id;
-  no_tabela *pTbl=tbl;
-  if(pTbl==NULL){
-    id = 0;
-  }else{
-      id = pTbl->dado.code;
-  }
-  return id;
+simbolo * localizar_simbolo (tabela *contexto, char *lexema){
+	tabela *temp = contexto;
+	no_tabela *temp2;
+	while(temp != NULL) {
+		temp2 = temp->primeiro;
+		while(temp2 != NULL) {
+			if(strcmp(temp2->dado->lexema, lexema) == 0) {
+				return temp2->dado;
+			}
+			temp2 = temp2->proximo;
+		}
+		temp = temp->pai;
+	}
+	return NULL;
 }
 
-int capturaIdlexema(no_tabela* tbl, char* lexema){
-  no_tabela *pTbl=tbl;
-  while(pTbl!=NULL){
-    if(strcmp(pTbl->dado.lexema,lexema)==0){
-      return pTbl->dado.code;
-    }
-    pTbl = pTbl->proximo;
-  }
-  return -1;
+
+simbolo *  criar_simbolo (char *lexema, int tipo) {
+	simbolo *novo = (simbolo *) malloc(sizeof(simbolo));
+	novo->tipo = tipo;
+	novo->lexema = strdup(lexema);
+	novo->val.ival = 0;
+	return novo;
 }
 
-void imprimirTabela(no_tabela* tbl){
-  no_tabela *pTbl=tbl;
-  printf("\n\n");
-  if(pTbl==NULL){
-    printf("vazio!\n");
-  }else{
-    while(pTbl!=NULL){
-    printf("id: %d - lexico: %s\n", pTbl->dado.code, pTbl->dado.lexema);
-    pTbl = pTbl->proximo;
-    }
-  }
+pilha_contexto* empilhar_contexto(pilha_contexto *pilha, tabela *contexto) {
+	pilha_contexto *novo = (pilha_contexto *) malloc (sizeof(pilha_contexto));
+	novo->anterior = pilha;
+	novo->dado = contexto;
+	return novo;
+}
+
+tabela * criar_contexto(tabela *pai) {
+	tabela *novo = (tabela *) malloc(sizeof(tabela));
+	novo->pai = pai;
+	novo->primeiro = NULL;
+	return novo;
+}
+
+void desempilhar_contexto(pilha_contexto **pilha) {
+	if(*pilha != NULL)
+		*pilha = (*pilha)->anterior;
+}
+
+tabela* topo_pilha(pilha_contexto *pilha) {
+	if(pilha == NULL)
+		return NULL;
+	else
+		return pilha->dado;
+
+}
+/*
+void imprimir_contexto(tabela *t) {
+	no_tabela * temp = t->primeiro;
+	printf("----------------------------------\n");
+	while(temp != NULL) {
+		if(temp->dado->tipo == INT)
+			printf("\t INT: %s (%d)\n", temp->dado->lexema, temp->dado->val.dval);
+		else
+			printf("\t FLOAT: %s (%d)\n", temp->dado->lexema, temp->dado->val.dval);
+		temp = temp->proximo;
+	}
+	printf("==================================\n");
+}
+*/
+
+numero* criar_numero(valor val, int tipo){
+	numero *novo = (numero *)malloc(sizeof(numero));
+	novo->tipo = tipo;
+	novo->val = val;
+	return novo;
 }
