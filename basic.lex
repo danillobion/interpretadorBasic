@@ -6,7 +6,6 @@
 #include "lista.h"
 #include <stdio.h>
 
-
 %}
 
 letra	[a-z|A-Z|_]

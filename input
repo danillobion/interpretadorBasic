@@ -29,8 +29,6 @@ else
   soma(a)
 end if
 
-
-
 do until (a > 10)
   if a>=b then
     dim a as integer

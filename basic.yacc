@@ -16,6 +16,7 @@ pilha_contexto *pilha;
 %left '+' '-'
 %left '*' '/'
 %left MOD
+
 %%
 program:
         functs bloco
@@ -51,6 +52,7 @@ decls:
 decl:
         DIM ID AS TYPE
 
+
         ;
 
 stmts:
@@ -76,7 +78,6 @@ logico:
         |booleano OR booleano
         |NOT booleano
         ;
-
 attr:
         ID ATTR expr
         ;
