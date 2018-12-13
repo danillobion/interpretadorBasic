@@ -4,6 +4,7 @@
 #endif
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "lista.h"
 int yylex(void);
 void yyerror(char *);
@@ -11,14 +12,18 @@ pilha_contexto *pilha;
 
 %}
 
-%token DIM AS NUMBER ID TYPE INTEIRO RELOP ATTR DECLARE FUNCTION END PRINT MOD IF TO THEN ELSE ENDIF LT LE GT GE EQ NE AND OR NOT DO LOOP UNTIL
+%token DIM AS NUMBER ID TYPE INTEIRO REAL RELOP ATTR DECLARE FUNCTION END PRINT MOD IF TO THEN ELSE ENDIF LT LE GT GE EQ NE AND OR NOT DO LOOP UNTIL
 %left RELOP OR AND NOT
 %left '+' '-'
 %left '*' '/'
 %left MOD
 %%
 program:
-        functs bloco
+        functs bloco          {//tabela *contexto = criar_contexto(topo_pilha(pilha));
+				                       //pilha = empilhar_contexto(pilha, contexto);
+                               imprimir_contexto(topo_pilha(pilha));
+				                       desempilhar_contexto(&pilha);
+                              }
         ;
 
 params:
@@ -26,7 +31,10 @@ params:
         |param
         ;
 param:
-        ID AS TYPE
+        ID AS TYPE            {
+                              simbolo * s = criar_simbolo((char *) $1, $3);
+                              inserir_simbolo(topo_pilha(pilha),s);
+                              }
         ;
 paramsv:
         params
@@ -38,7 +46,12 @@ functs:
         |
         ;
 funct:
-        DECLARE FUNCTION ID '(' paramsv ')' AS TYPE bloco END FUNCTION
+        DECLARE FUNCTION ID { tabela *contexto = criar_contexto(topo_pilha(pilha));
+				                       pilha = empilhar_contexto(pilha, contexto);}
+
+        '(' paramsv ')' AS TYPE bloco END FUNCTION { imprimir_contexto(topo_pilha(pilha));
+           desempilhar_contexto(&pilha);
+          }
         ;
 bloco:
         decls stmts
@@ -49,8 +62,11 @@ decls:
         |
         ;
 decl:
-        DIM ID AS TYPE
-
+        DIM ID AS TYPE                  {
+                                         simbolo * s = criar_simbolo((char *) $2, $4);
+                                         inserir_simbolo(topo_pilha(pilha),s);
+                                        }
+        | DIM ID '(' NUMBER ')'
         ;
 
 stmts:
@@ -70,6 +86,7 @@ cond:
 booleano:
         expr RELOP expr
         |logico
+        | '(' booleano ')'
         ;
 logico:
         booleano AND booleano
@@ -78,11 +95,23 @@ logico:
         ;
 
 attr:
-        ID ATTR expr
+        ID ATTR expr {
+                      simbolo *s = localizar_simbolo(topo_pilha(pilha),(char *) $1);
+                      if(s == NULL){
+                            yyerror("Identificador não declarado");
+                      }
+                      //else
+                     }
         ;
 expr:
         NUMBER
-        |ID
+        |ID         {
+                      simbolo *s = localizar_simbolo(topo_pilha(pilha),(char *) $1);
+                      if(s == NULL){
+                            yyerror("Identificador não declarado");
+                      }
+                      //else
+                     }
         |funCall
         |expr '+' expr
         |expr '-' expr
@@ -117,6 +146,10 @@ void yyerror(char *s){
 int main(void){
   pilha = NULL;
   tabela *contexto = criar_contexto(topo_pilha(pilha));
+  pilha = empilhar_contexto(pilha, contexto);
+
   yyparse();
+
+
   return 0;
 }

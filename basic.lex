@@ -20,6 +20,10 @@ integer                   {
                               yylval = INTEIRO;
                               return TYPE;
                           }
+double                    {
+                              yylval = REAL;
+                              return TYPE;
+                          }
 declare                   {return DECLARE;}
 function                  {return FUNCTION;}
 end                       {return END;}
@@ -48,7 +52,12 @@ to                        {return TO;}
                               return NUMBER;
                           }
 
-{numero}+"."{numero}+     { }
+{numero}+"."{numero}+     {
+                              valor v;
+                              v.ival = atoi(yytext);
+                              yylval = (long int) criar_numero(v, REAL);
+                              return NUMBER;
+                          }
 
 
 "<"                       {yylval = LT; return RELOP;}

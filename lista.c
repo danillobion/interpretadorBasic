@@ -1,15 +1,15 @@
 #include "lista.h"
+#include "y.tab.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-
 
 void inserir_simbolo(tabela *t, simbolo *s) {
 	no_tabela *no = (no_tabela *) malloc(sizeof(no_tabela));
 	no->dado = s;
 	no->proximo = t->primeiro;
 	t->primeiro = no;
+	//printf("lexema :%s\n",t->primeiro->dado->lexema);
 }
 
 
@@ -62,22 +62,21 @@ tabela* topo_pilha(pilha_contexto *pilha) {
 		return NULL;
 	else
 		return pilha->dado;
-
 }
-/*
+
 void imprimir_contexto(tabela *t) {
 	no_tabela * temp = t->primeiro;
 	printf("----------------------------------\n");
 	while(temp != NULL) {
-		if(temp->dado->tipo == INT)
-			printf("\t INT: %s (%d)\n", temp->dado->lexema, temp->dado->val.dval);
+		if(temp->dado->tipo == INTEIRO)
+			printf("\t INT: %s (%d)\n", temp->dado->lexema, temp->dado->val.ival);
 		else
-			printf("\t FLOAT: %s (%d)\n", temp->dado->lexema, temp->dado->val.dval);
+			printf("\t FLOAT: %s (%f)\n", temp->dado->lexema, temp->dado->val.fval);
 		temp = temp->proximo;
 	}
 	printf("==================================\n");
 }
-*/
+
 
 numero* criar_numero(valor val, int tipo){
 	numero *novo = (numero *)malloc(sizeof(numero));

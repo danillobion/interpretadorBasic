@@ -1,7 +1,7 @@
 #ifndef lista_H
 #define lista_H
 
-
+//############# - LISTA DE NUMEROS - #########################
 typedef union valor {
 	int ival;
 	float fval;
@@ -11,6 +11,7 @@ typedef struct numero {
 	int tipo;
 	valor val;
 } numero;
+//############################################################
 
 typedef struct simbolo {
 	int tipo;
